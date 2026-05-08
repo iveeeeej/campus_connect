@@ -1,0 +1,17 @@
+# Local environment files
+.env
+backend/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Django/local runtime output
+backend/staticfiles/
+backend/media/
+
+# Test and tooling caches
+.pytest_cache/
+.coverage
+htmlcov/

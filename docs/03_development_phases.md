@@ -221,6 +221,37 @@ Pending → Approved → Rejected
 - Initial backend authentication and authorization rules implemented.
 - API-first foundation ready for officer web, signatory web, and student mobile clients.
 
+### Progress Tracking
+
+- [x] Existing `backend/` folder used for the Phase 1 backend implementation.
+- [x] Django, Django REST Framework, SimpleJWT, PostgreSQL driver, and environment configuration dependencies added.
+- [x] Split Django settings structure added for base, development, and production configuration.
+- [x] PostgreSQL configured as the default local development database.
+- [x] PostGIS support prepared through environment-controlled settings without building attendance/geolocation features yet.
+- [x] API-first routing foundation added.
+- [x] Centralized API exception and success response helpers added.
+- [x] Development and production-ready logging foundation added.
+- [x] One custom `User` model added for all login account types.
+- [x] Five technical roles added: `SUPER_ADMIN`, `USG_OFFICER`, `ORG_OFFICER`, `STUDENT`, and `SIGNATORY`.
+- [x] Organization model added with initial support for `USG`, `SITE`, `PAFE`, and `AFPROTECH`.
+- [x] Shared officer account support added for `USG_OFFICER`, `SITE_OFFICER`, `PAFE_OFFICER`, and `AFPROTECH_OFFICER`.
+- [x] Student profile model added with student identity, course, section, school ID QR reference, and face embedding registration status fields.
+- [x] Student account status flow added with pending, approved, rejected, and deactivated states.
+- [x] Student rejection reason support added.
+- [x] Student course-to-organization visibility helper added for IT, BTLED, and BFPT mappings.
+- [x] Backend permission helpers added for approved access, student registration review, Super Admin access, and organization-owned record checks.
+- [x] JWT login and refresh endpoints added.
+- [x] Current authenticated user endpoint added.
+- [x] Backend-only student management API endpoints added for add, edit, approve, reject, and deactivate.
+- [x] Rerunnable `seed_phase1` management command added for organizations and default accounts.
+- [x] Initial migrations added for accounts and organizations.
+- [x] Backend tests added for organization permissions, student API behavior, and seed command rerun safety.
+- [x] Django system check passes.
+- [x] Migration dry run reports no model changes pending.
+- [x] Temporary SQLite smoke test passes.
+- [x] Apply migrations against the target local PostgreSQL database after PostgreSQL is running.
+- [x] Run the full test suite against the target local PostgreSQL database after PostgreSQL is running.
+
 ---
 
 ## Phase 2 – Officer / Super Admin Web Platform Core
