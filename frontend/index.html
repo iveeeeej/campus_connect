@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - University of Student Government</title>
-    <link rel="icon" href="../frontend/assets/logo/usg.png" type="image/png">
+    <link rel="icon" href="../frontend/assets/logo/usg_logo_transparent.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <style>
@@ -194,7 +194,7 @@
             <!-- For desktop: Image and caption on the right -->
             <div class="col-md-6 d-none d-md-block p-0">
                 <div class="image-container">
-                    <img src="../frontend/assets/img/sample_img4.png" alt="Side Image" class="side-image">
+                    <img src="../frontend/assets/images/login_img.png" alt="Side Image" class="side-image">
                     <div class="image-caption">
                         <h2>THE INNOVATORS OF TOMORROW, <span class="highlight-text">TRAILBLAZERS</span></h2>
                     </div>
@@ -204,7 +204,7 @@
             <!-- For mobile: Image and caption first -->
             <div class="col-12 d-md-none">
                 <div class="image-container">
-                    <img src="../frontend/assets/img/sample_img4.png" alt="Side Image" class="side-image">
+                    <img src="../frontend/assets/images/login_img.png" alt="Side Image" class="side-image">
                 </div>
                 <div class="image-caption">
                     <h2>THE INNOVATORS OF TOMORROW, <span class="highlight-text">TRAILBLAZERS</span></h2>
@@ -215,7 +215,7 @@
             <div class="col-md-6 d-flex justify-content-center align-items-center">
                 <div class="login-card">
                     <!-- Logo -->
-                    <img src="../frontend/assets/logo/usg_2.png" alt="Logo" class="logo">
+                    <img src="../frontend/assets/logo/usg_logo.png" alt="Logo" class="logo">
 
                     <!-- Login Form -->
                     <form id="loginForm">
@@ -245,45 +245,7 @@
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-    <script src="assets/js/app-config.js"></script>
-    <script src="assets/js/api-client.js"></script>
-
-    <script>
-        const API = window.USG_API;
-
-        document.getElementById("loginForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            const student_id = document.getElementById("idNumber").value;
-            const password = document.getElementById("password").value;
-
-            if (!student_id || !password) {
-                alert("Please enter ID and password.");
-                return;
-            }
-
-            try {
-                const result = await API.post("/api/token/", {
-                    json: {
-                        student_id: student_id,
-                        password: password
-                    }
-                });
-                const data = result.data || {};
-
-                if (result.ok) {
-                    API.setTokens(data);
-
-                    window.location.href = "org_usg/usg_dashboard.html";
-                } else {
-                    alert(data.detail || "Login failed");
-                }
-
-            } catch (error) {
-                alert("Server error");
-            }
-        });
+        crossorigin="anonymous">
     </script>
 
 </body>
