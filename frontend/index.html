@@ -26,11 +26,8 @@
         }
 
         .image-caption-card {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            max-width: 1000px;
+            background-color: #fbfbfb;
+            max-width: 800px;
             width: 100%;
             min-height: 650px;
             overflow: hidden;
@@ -41,6 +38,7 @@
         }
 
         .image-caption-card img {
+            margin-top: 2rem;
             max-width: 100%;
             height: auto;
             object-fit: contain;
@@ -48,16 +46,16 @@
         }
 
         .image-caption {
-            font-size: 2.2rem;
-            font-weight: 700;
+            font-size: 3rem;
+            font-weight: bold;
             text-align: center;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
             color: #343a40;
         }
 
         .highlight-text {
-            font-size: 2.2rem;
-            font-weight: 700;
+            font-size: 3rem;
+            font-weight: bold;
             color: #1E174A;
         }
 
@@ -216,14 +214,16 @@
                 <div class="image-caption-card">
                     <img src="../frontend/assets/images/login_img_2.gif" alt="img">
                     <div class="image-caption">
-                        <text>THE INNOVATORS OF TOMORROW, <span class="highlight-text">TRAILBLAZERS</span></text>
+                        <text>THE INNOVATORS OF TOMORROW,</text>
+                    </div>
+                    <div class="highlight-text">
+                        <text>TRAILBLAZERS</text>
                     </div>
                 </div>
             </div>
 
 
-            <!-- Login card - appears after image and caption on mobile -->
-            <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <div class="col-md-6 d-flex justify-content-end align-items-center">
                 <div class="login-card">
                     <!-- Logo -->
                     <img src="../frontend/assets/logo/usg_logo.png" alt="Logo" class="logo">
