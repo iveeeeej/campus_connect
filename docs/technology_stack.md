@@ -19,12 +19,14 @@ The stack must support the latest Campus Connect system direction:
 - Signatory Web Platform
 - Student Mobile Application
 - centralized backend API enforcement
+- preloaded student master record matching for student mobile registration
 - PostgreSQL-backed data storage
 - PostGIS-backed geolocation validation
 - facial recognition through a separate ML/AI service
 - DOCX/PDF export for finalized event documents and reports
 - database-backed in-app notifications and FCM-based push notification delivery
-- local file/media storage first, with cloud storage as a deployment option
+- Cloudinary-backed image storage for Lost and Found item images, with optional face reference image storage only if formally approved
+- local file/media storage for other files first, with cloud storage as a deployment option
 
 The technology stack is divided into the following layers:
 
@@ -57,7 +59,7 @@ The backend is responsible for:
 - user authentication
 - role-based access enforcement
 - organization ownership enforcement
-- student account approval rules
+- student master record matching and student account activation rules
 - signatory registration and approval rules
 - event document workflow rules
 - report template workflow rules
@@ -89,6 +91,7 @@ DRF is used to expose protected REST API endpoints for:
 - Signatory Web Platform requests
 - Student Mobile Application requests
 - authentication and account workflows
+- student master record matching and account activation workflows
 - organization-scoped record retrieval
 - workflow submissions
 - file upload handling
@@ -158,6 +161,7 @@ Environment-based configuration should be used to avoid hardcoding:
 - allowed hosts
 - database credentials
 - media storage paths
+- Cloudinary configuration values
 - CORS settings
 - FCM configuration values
 - ML/AI service URL
@@ -300,7 +304,7 @@ The Flutter mobile client may be maintained in a separate repository from the Dj
 
 The Student Mobile Application is responsible for:
 
-- student registration
+- student registration through preloaded student master record matching
 - student login
 - profile viewing
 - viewing USG and assigned organization records
@@ -308,8 +312,9 @@ The Student Mobile Application is responsible for:
 - viewing the student calendar
 - viewing announcements
 - participating in attendance
-- scanning the physical school ID QR
-- capturing face data for attendance validation
+- scanning the physical school ID QR during registration and attendance
+- submitting registration details for matching against preloaded student master records
+- capturing face data for registration and attendance validation
 - submitting geolocation data for attendance validation
 - viewing attendance status
 - viewing violations and equivalent community service/payment details
@@ -388,6 +393,8 @@ The database must support records such as:
 - accounts
 - roles
 - organizations
+- preloaded student master records
+- linked student user accounts
 - student profiles
 - signatory profiles
 - signatures
@@ -406,6 +413,8 @@ The database must support records such as:
 - export history
 - notifications
 - file/media references
+
+Student master records are the official preloaded student data used to validate student mobile registration. A student user account should be linked to exactly one student master record after successful identity matching. The backend must prevent duplicate account claims for the same student master record.
 
 ### 5.2 Geospatial Support
 
@@ -447,13 +456,15 @@ Student mobile app captures face
 
 This separation keeps the main Django backend focused on business rules and allows the face recognition component to evolve independently.
 
-### 6.2 Face Embedding Rule
+### 6.2 Face Embedding and Face Image Storage Rule
 
-The system must store **face embeddings only** for long-term identity matching.
+Face recognition must primarily rely on **face embeddings** for long-term identity matching.
 
-The system must not store raw face images as permanent records.
+Raw face images should not be stored permanently by default. Temporary face images may be processed only as needed for face embedding generation or verification, subject to secure handling and deletion rules defined during implementation.
 
-Temporary face images may be processed only as needed for face embedding generation or verification, subject to secure handling and deletion rules defined during implementation.
+If the school, adviser, or panel formally approves storing face reference images for registration review or audit support, the image may be stored through Cloudinary with strict access control. PostgreSQL must store the official Cloudinary reference, such as the `public_id` and secure URL, together with the student face registration record.
+
+Firebase must not be used as the official face image database. Firebase remains limited to push notification delivery through FCM.
 
 ### 6.3 ML/AI Service Responsibilities
 
@@ -496,26 +507,49 @@ Campus Connect must handle several file and media types:
 - global payment QR code
 - student receipt screenshots
 - signatory signature images
+- Lost and Found item images stored through Cloudinary
+- optional face reference images stored through Cloudinary only if formally approved
 - generated DOCX event documents
 - generated PDF event documents
 - generated DOCX reports
 - generated PDF reports
 - optional event/report attachment files if allowed later
 
-The system should use **local server storage first** for capstone/demo implementation.
+The system should use **Cloudinary** for Lost and Found item images. Cloudinary may also be used for face reference images only if permanent face image storage is formally approved by the school, adviser, or panel.
 
-Cloud storage may be considered as a deployment option later.
+For other files, the system may use local server storage first for capstone/demo implementation unless a cloud storage option is specifically selected.
 
-Possible cloud storage options may include:
+Possible storage options for other files may include:
 
+- local server media storage
 - AWS S3
 - Google Cloud Storage
 - Azure Blob Storage
 - other equivalent object storage services
 
-Cloud storage is not required for the main local development build.
+Cloudinary stores selected image files only. Django/PostgreSQL remains the source of truth for official records, ownership, status, visibility, and access control.
 
-### 7.2 Secure File Handling Rules
+### 7.2 Cloudinary Image Storage Rules
+
+Cloudinary may be used as the image storage service for:
+
+- Lost and Found item images
+- optional face reference images only if formally approved
+
+For each Cloudinary-stored image, PostgreSQL should store the official record and the Cloudinary reference, such as:
+
+- `public_id`
+- secure image URL
+- upload timestamp
+- related record reference
+- uploaded-by account where applicable
+- active/inactive or replaced status where applicable
+
+Cloudinary must not replace the main database. The backend must still enforce all access, ownership, workflow, and visibility rules.
+
+Firebase must not be used as the official image reference database. Firebase remains limited to FCM push notification delivery.
+
+### 7.3 Secure File Handling Rules
 
 The backend must control file access.
 
@@ -526,13 +560,14 @@ File handling must enforce:
 - allowed file types
 - file size limits
 - secure upload endpoints
+- Cloudinary `public_id` / secure URL reference handling where applicable
 - role-based access
 - organization ownership
 - signatory assignment access
 - student ownership for personal files
 - export history tracking where applicable
 
-### 7.3 DOCX Export Support
+### 7.4 DOCX Export Support
 
 Finalized event documents and reports may be exported as DOCX after all required signatories are completed.
 
@@ -551,7 +586,7 @@ DOCX export must preserve:
 - completed signatories/signatures where required
 - approval/disapproval records where applicable
 
-### 7.4 PDF Export Support
+### 7.5 PDF Export Support
 
 Finalized event documents and reports may also be exported as PDF after all required signatories are completed.
 
@@ -566,7 +601,7 @@ The selected PDF approach must preserve official formatting as closely as possib
 
 PDF export must not turn the document/report module into a free-form word processor.
 
-### 7.5 Export History
+### 7.6 Export History
 
 The backend should record export history for finalized event documents and reports.
 
@@ -627,7 +662,7 @@ FCM should only deliver the notification to the device after the backend determi
 
 Notification records may support:
 
-- student account approval or rejection
+- student account activation or rejected registration attempt
 - signatory account approval or rejection
 - new announcements
 - event or meeting updates
@@ -786,7 +821,7 @@ Testing should cover:
 
 The main Campus Connect build does **not** depend on the following as primary technologies:
 
-- Supabase or Firebase as the primary backend or database
+- Supabase or Firebase as the primary backend, database, or official face image database
 - internal payment gateway processing
 - direct payment gateway callbacks
 - face liveness detection / anti-spoofing
@@ -797,6 +832,7 @@ The main Campus Connect build does **not** depend on the following as primary te
 Clarifications:
 
 - Firebase Cloud Messaging may be used only for push notification delivery.
+- Cloudinary may be used for selected image storage, especially Lost and Found item images and optional approved face reference images, but it does not replace Django/PostgreSQL as the source of truth.
 - Payments are made externally and tracked inside Campus Connect.
 - Django and PostgreSQL remain the primary backend and data source.
 - FastAPI is preferred only for the separate ML/AI face recognition service.
@@ -903,7 +939,7 @@ This stack fits Campus Connect because it supports:
 - local-first capstone deployment
 - future growth without replacing the primary backend
 
-The stack also avoids unnecessary dependency on backend-as-a-service platforms. Django and PostgreSQL remain the official backend and data foundation, while tools such as FCM, FastAPI, document export libraries, and optional cloud storage support specific system capabilities without replacing the core architecture.
+The stack also avoids unnecessary dependency on backend-as-a-service platforms. Django and PostgreSQL remain the official backend and data foundation, while tools such as FCM, FastAPI, Cloudinary, document export libraries, and optional cloud storage support specific system capabilities without replacing the core architecture.
 
 ---
 
@@ -919,7 +955,8 @@ The main stack is:
 - HTML, CSS, JavaScript, and Bootstrap for the Officer / Super Admin Web Platform and Signatory Web Platform
 - Flutter + Dart for the Student Mobile Application
 - a separate ML/AI service, preferably FastAPI-based, for facial recognition
-- local server storage first for files and exports
+- Cloudinary for Lost and Found item images and optional approved face reference images
+- local server storage first for other files and exports unless another storage option is selected
 - replaceable DOCX/PDF generation tools for finalized event documents and reports
 - database-backed notifications with FCM for mobile push delivery
 - REST API polling / timed refresh for the main chat implementation

@@ -24,7 +24,7 @@ The platform follows a **web + mobile + centralized backend** model with three u
 - the **Signatory Web Platform** is used by approved signatory users to review assigned event documents and reports and mark them as **For Approval** or **For Disapproval**
 - the **Student Mobile Application** is used for registration, attendance participation, record viewing, receipt submission, receiving in-app notifications, and receiving mobile push notifications where enabled
 - the **backend API** acts as the single source of truth and must enforce authentication, validation, organization ownership, workflow rules, signatory assignment, and data integrity
-- the **database layer** stores accounts, organizations, attendance records, event documents, reports, payments, violations, announcements, meetings, events, signatures, export history, and other official system records
+- the **database layer** stores accounts, organizations, attendance records, event documents, reports, payments, violations, announcements, meetings, events, signatures, export history, Cloudinary media references where applicable, and other official system records
 
 This file is intended as a **development guide for an LLM agent or developer**. It defines the official product direction, module boundaries, role model, organization-scoped access model, and core workflow rules for the system.
 
@@ -56,10 +56,11 @@ Campus Connect must support the following objectives:
 - provide a centralized officer dashboard connected to backend data, including a calendar for event and meeting schedules
 - manage organization-owned events and meetings through the officer web platform
 - support official announcements and global Chats / Messaging for student-officer communication
+- support student mobile registration through preloaded student master record matching
 - digitize attendance using school ID QR scanning, geolocation validation, and facial recognition
 - support sign-in and sign-out attendance validation
 - detect missing sign-in/sign-out checkpoints and prepare pending violations for officer confirmation
-- support Lost and Found visibility through USG-posted found item records
+- support Lost and Found visibility through USG-posted found item records, including item images stored through Cloudinary where applicable
 - support payment tracking through student receipt screenshot submission, manual payment recording, and officer verification
 - support structured event documents and official reports using fixed templates and controlled editable fields
 - support DOCX/PDF export for finalized event documents and reports after required signatories are completed
@@ -208,7 +209,7 @@ The backend must enforce:
 
 - authentication
 - role-based access
-- student account approval rules
+- student master record matching and student account activation rules
 - attendance validation
 - payment verification workflow
 - violation confirmation workflow
@@ -233,10 +234,10 @@ The system scope includes:
 - meeting management
 - announcements
 - global Chats / Messaging for students, officers, and Super Admin
-- student registration and officer approval
+- student registration through preloaded student master record matching and auto-approval when all required checks pass
 - attendance with school ID QR scan, geolocation, and facial recognition
 - violation monitoring and officer confirmation
-- USG Lost and Found viewing from USG-posted records
+- USG Lost and Found viewing from USG-posted records, including item images stored through Cloudinary where applicable
 - payment tracking with receipt screenshot upload, manual payment recording, and officer verification
 - fixed-template event documents and reports
 - DOCX/PDF export for finalized event documents and reports
@@ -325,15 +326,14 @@ The `SUPER_ADMIN` must also support student account management through the web U
 
 The `SUPER_ADMIN` may also approve or reject signatory registrations.
 
-Student account management includes:
+Student master record and student account management includes:
 
-- add student accounts
-- edit student account information
-- approve student registrations
-- reject student registrations
-- deactivate student accounts
+- add or import preloaded student master records
+- edit student master record information
+- view linked student user accounts
+- deactivate student accounts where necessary
 
-Rejected student registrations must include a rejection reason.
+Student mobile registration is not manually approved by default. A student account is activated only when the submitted registration details match an existing student master record and all required checks pass.
 
 The `SUPER_ADMIN` must not replace the need for organization ownership. Even though the `SUPER_ADMIN` can access everything, normal officer accounts must still be restricted to their own organization records.
 
@@ -443,10 +443,42 @@ The `STUDENT` role is used for individual student accounts.
 
 Students use the mobile application as the primary student-facing interface.
 
-A student account is required for:
+Campus Connect assumes that official student data is already stored in the database before student mobile registration begins. This official stored data is called the **student master record**.
+
+A student master record represents the school-validated student identity. It should include information such as:
+
+- student ID
+- firstname
+- middlename
+- lastname
+- email
+- course
+- year level
+- section
+- school ID QR reference or extracted student identity value
+- student record status
+
+Student registration is treated as an **account claiming or account activation process**, not as open registration.
+
+A student may register through the mobile application only if the submitted registration details match an existing student master record.
+
+Required matching checks must include:
+
+- Student ID
+- full name
+- email
+- school ID QR scan or extracted school ID QR value
+
+If all required checks pass, including student master record matching, school ID QR matching, and successful face registration, the student account may be automatically approved or activated.
+
+If any required check fails, the registration must be rejected immediately and the system must not create an active student account.
+
+The system must prevent duplicate account claims for the same student master record. Once a student master record is already linked to an active student user account, another account must not be allowed to claim the same record.
+
+A student user account is required for:
 
 - mobile login
-- student profile ownership
+- linked student master record ownership
 - student ID verification
 - school ID QR matching
 - face registration
@@ -456,24 +488,16 @@ A student account is required for:
 - personal notification delivery
 - personal record viewing
 
-Student accounts must store the student profile information needed for system workflows.
+Student user accounts should store or reference:
 
-Required student identity and profile data should include:
-
-- student ID
+- linked student master record
+- username or email
 - password
-- email
-- firstname
-- middlename
-- lastname
-- course
-- year level
-- section
 - account status
-- school ID QR reference or extracted student identity value
 - face embedding registration status
+- optional approved face reference image record where formally allowed
 
-Student accounts must store course/department information so the backend can determine the student's assigned course/department organization.
+Student course/department information must come from the linked student master record so the backend can determine the student's assigned course/department organization.
 
 Student visibility rules:
 
@@ -484,7 +508,7 @@ Student visibility rules:
 
 Students must not manually switch organizations.
 
-The backend must determine student-visible records automatically from the student profile.
+The backend must determine student-visible records automatically from the linked student master record.
 
 Student mobile records should include:
 
@@ -500,27 +524,10 @@ Examples:
 - `[PAFE] Department Activity`
 - `[AFPROTECH] Organization Meeting`
 
-Student accounts follow this status flow:
-
-```text
-Pending → Approved → Rejected
-```
-
-A student may register through the mobile application, but the account must be approved before the student can fully use protected system features.
-
-During approval, the approving user must verify:
-
-- student ID
-- student profile information
-- school ID QR information
-- face registration result
-
-If the registration is rejected, a rejection reason must be provided.
-
 A student belongs to:
 
 - USG by default
-- one assigned course/department organization
+- one assigned course/department organization based on the linked student master record
 
 The system uses one course/department organization assignment per student for organization visibility.
 
@@ -604,7 +611,8 @@ Each organization has its own shared officer account. Since several officers wit
 
 This rule applies to all important officer actions, including:
 
-- student account approval or rejection
+- student master record creation or update
+- student account deactivation
 - event creation or major update
 - meeting creation or major update
 - announcement creation or major update
@@ -656,6 +664,10 @@ General enforcement rules:
 - `ORG_OFFICER` may manage records owned by its assigned organization only.
 - `STUDENT` may view USG records plus records from their assigned course/department organization.
 - `STUDENT` may access only their own personal records for attendance, violations, payments, profile, and notifications.
+- Student mobile registration must match a preloaded student master record using Student ID, full name, email, and school ID QR before account activation.
+- Student accounts may be auto-approved only when all required identity checks and face registration pass.
+- Failed student registration matching must be rejected immediately and must not create an active student account.
+- Duplicate account claims for the same student master record must be prevented.
 - `SIGNATORY` may access only assigned event documents or reports after the signatory account is approved.
 - Only `SUPER_ADMIN` and `USG_OFFICER` may approve or reject signatory registrations.
 - Signatory signatures may be drawn in the system or uploaded as signature images.
@@ -718,17 +730,27 @@ Organization officers must not access, edit, approve, reject, or delete records 
 
 ### 6.3 Student Account Governance
 
-Student accounts are individual accounts.
+Student identity is based on preloaded student master records.
 
-Student registration and account control must follow this governance rule:
+A **student master record** is the official student data already stored in the database before the student creates or activates a mobile account.
 
-- `SUPER_ADMIN` can add, edit, approve, reject, and deactivate student accounts.
-- `USG_OFFICER` can approve and reject student registrations.
-- `ORG_OFFICER` accounts cannot approve or reject student registrations.
+Student registration and account activation must follow this rule:
 
-Rejected student registrations must include a rejection reason.
+- the student enters the required registration details through the mobile app
+- the system checks the submitted Student ID, full name, email, and school ID QR against the preloaded student master record
+- if all required checks pass and face registration succeeds, the student account may be automatically approved or activated
+- if any required check fails, the registration must be rejected immediately
+- the system must prevent duplicate account claims for the same student master record
 
-Student course/department information determines which course/department organization records the student may view in addition to USG records.
+Student master record and account control must follow this governance rule:
+
+- `SUPER_ADMIN` can add, import, edit, and deactivate student master records and student user accounts where necessary.
+- `USG_OFFICER` may be allowed to help review student records only if the system explicitly grants that workflow.
+- `ORG_OFFICER` accounts cannot manage official student master records or override student registration matching.
+
+Student registration rejection caused by failed matching does not require manual officer approval. The system rejects the attempt because the submitted identity does not match the stored student master record.
+
+Student course/department information must come from the linked student master record and determines which course/department organization records the student may view in addition to USG records.
 
 ---
 
@@ -815,8 +837,8 @@ Required enforcement rules:
 - Signatory signature updates must apply only to future documents and must not alter finalized or exported files.
 - Only `SUPER_ADMIN` can upload or replace the global payment QR code.
 - Payment QR upload history must be retained.
-- Only `SUPER_ADMIN` and `USG_OFFICER` can approve or reject student registrations.
-- `ORG_OFFICER` accounts must not approve or reject student registrations.
+- Student registration must be validated against preloaded student master records before a student account is activated.
+- The system must prevent duplicate account claims for the same student master record.
 - Event document and report signatory actions must follow the assigned signatory workflow.
 - Shared officer accounts must require manually typed real officer names for important actions.
 
@@ -873,7 +895,7 @@ The dashboard should generally support role-appropriate visibility over:
 - meetings
 - announcements
 - attendance summaries
-- student account approvals where allowed
+- student account activations or failed registration monitoring where allowed
 - pending violations
 - payment submissions
 - reports
@@ -1196,15 +1218,17 @@ Facial recognition is required for attendance validation.
 
 Students register their face during account registration.
 
-The system must store **face embeddings only**.
+Face recognition must primarily rely on **face embeddings** for long-term identity matching.
 
-The system must not store raw face images as permanent records.
+Raw face images should not be stored permanently by default. The system should use face images only for temporary processing during registration and attendance verification unless permanent face image reference storage is formally approved by the school, adviser, or panel.
 
-If the submitted face registration is unclear or unsuitable, the student registration must be rejected with a rejection reason by an allowed student-approval user.
+If approved, face reference images may be stored through Cloudinary with strict access control. PostgreSQL must store the official Cloudinary reference, such as the `public_id` and secure URL, together with the student face registration record. Firebase must not be used as the official face image database; Firebase remains limited to push notification delivery through FCM.
 
-Only `SUPER_ADMIN` and `USG_OFFICER` may approve or reject student registrations.
+If the submitted face registration is unclear or unsuitable, the student registration must be rejected immediately because all required registration checks must pass before account activation.
 
-Facial recognition is only used for attendance validation. It is not used as the main login method.
+Student registration does not require manual officer approval by default. The system may automatically approve or activate the account only when student master record matching, school ID QR matching, and face registration all succeed.
+
+Facial recognition is only used for attendance validation and face registration setup. It is not used as the main login method.
 
 ### Violation
 
@@ -1260,8 +1284,11 @@ Only `USG_OFFICER` and `SUPER_ADMIN` may manage Lost and Found records.
 Allowed management actions include:
 
 - post found item records
+- upload or update found item images where applicable
 - update found item details
 - mark found items as claimed
+
+Lost and Found item images may be stored through Cloudinary. PostgreSQL must store the official Lost and Found record and the Cloudinary image reference, such as the `public_id` and secure image URL. Cloudinary stores the image file only; Django/PostgreSQL remains the source of truth for item status, ownership, visibility, and access control.
 
 `ORG_OFFICER` accounts must not access or manage Lost and Found records.
 
@@ -1473,7 +1500,7 @@ In-app notifications must be stored as system records in the database. Mobile pu
 
 Notification records may cover:
 
-- student account approval or rejection
+- student account activation or rejected registration attempt
 - signatory account approval or rejection
 - new announcements
 - event or meeting updates
@@ -1525,9 +1552,17 @@ Student-side access rules:
 
 ### 9.3 Student Identity Rule
 
-Student identity must come from the authenticated student account.
+Student identity must come from a linked student user account and preloaded student master record.
 
-During attendance, the scanned school ID QR must match the logged-in student account.
+During student registration, the submitted Student ID, full name, email, and school ID QR must match an existing student master record in the database.
+
+If all required identity checks pass and face registration succeeds, the student account may be automatically approved or activated.
+
+If any required identity check fails, the registration must be rejected immediately and the system must not create an active student account.
+
+The system must prevent duplicate account claims for the same student master record.
+
+During attendance, the scanned school ID QR must match the logged-in student account and the linked student master record.
 
 If the scanned QR belongs to another student, attendance must be rejected.
 
@@ -1602,7 +1637,7 @@ The system is organized into the following modules:
 - Services: Attendance, Violation, Lost and Found, Payment
 - Reports: AWFP, Financial Report, Auditor’s Report, Accomplishment Report
 
-Lost and Found is a USG-managed service. All students may view USG-posted found items, but only `USG_OFFICER` and `SUPER_ADMIN` may manage them.
+Lost and Found is a USG-managed service. All students may view USG-posted found items, including item images stored through Cloudinary where applicable, but only `USG_OFFICER` and `SUPER_ADMIN` may manage them.
 
 Attendance is validated through student login, active session selection, physical school ID QR scanning, geolocation, and facial recognition. Both sign-in and sign-out are required, and attendance status may be `PRESENT`, `INCOMPLETE`, or `ABSENT` based on completed checkpoints.
 

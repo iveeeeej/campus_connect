@@ -8,6 +8,7 @@ This roadmap must align with the latest project overview. The source of truth fo
 
 - organization-scoped Campus Connect design
 - five-role access model
+- preloaded student master record matching for student mobile registration
 - Officer / Super Admin Web Platform
 - Signatory Web Platform
 - Student Mobile Application
@@ -68,7 +69,8 @@ This phase prepares the system to support the five-role model and organization-s
 - Five application roles
 - Organization model
 - Shared officer account model
-- Student account model
+- Preloaded student master record model
+- Student account activation model
 - Basic authorization and ownership enforcement
 - API-first backend structure
 - System-wide configuration foundation
@@ -148,12 +150,11 @@ role: ORG_OFFICER
 organization: AFPROTECH
 ```
 
-#### Student Accounts
+#### Student Master Records and Student Accounts
 
-- Implement the student account structure.
-- Store student identity and profile fields needed by later workflows:
+- Implement the preloaded student master record structure.
+- Store official student identity and profile fields needed by registration and later workflows:
   - student ID
-  - password
   - email
   - firstname
   - middlename
@@ -161,20 +162,24 @@ organization: AFPROTECH
   - course
   - year level
   - section
-  - account status
   - school ID QR reference or extracted student identity value
-  - face embedding registration status
-- Implement student status flow:
-
-```text
-Pending → Approved → Rejected
-```
-
-- Prepare rejection reason support.
-- Prepare student visibility rules based on course or department:
+  - student record status
+- Implement the student user account structure.
+- Link each student user account to one student master record after successful registration matching.
+- Implement student mobile registration as an account claiming or account activation process.
+- Validate registration using:
+  - Student ID
+  - full name
+  - email
+  - school ID QR scan or extracted school ID QR value
+- Auto-approve or activate the student account only if all required identity checks pass and face registration succeeds.
+- Reject registration immediately if any required check fails.
+- Prevent duplicate account claims for the same student master record.
+- Prepare student visibility rules based on the linked student master record course or department:
   - IT → USG + SITE
   - BTLED → USG + PAFE
   - BFPT → USG + AFPROTECH
+- Store face embedding registration status for the linked student account.
 
 #### Super Admin Foundation
 
@@ -182,12 +187,11 @@ Pending → Approved → Rejected
 - Prepare full system-wide access support.
 - Prepare organization filtering support for Super Admin views.
 - Prepare Super Admin-only capability for global payment QR management, which will be implemented in Phase 5.
-- Prepare Super Admin student account management permissions:
-  - add students
-  - edit students
-  - approve students
-  - reject students
-  - deactivate students
+- Prepare Super Admin student master record and student account management permissions:
+  - add or import student master records
+  - edit student master records
+  - view linked student user accounts
+  - deactivate student accounts where necessary
 
 #### Access Enforcement Foundation
 
@@ -208,7 +212,10 @@ Pending → Approved → Rejected
 - `STUDENT` must only access their own personal records and visible USG + assigned organization records.
 - `SIGNATORY` must be defined as a role but should not have active document access until the signatory workflow is built.
 - Officer position names such as president, treasurer, auditor, or adviser must not be used as login roles or authorization roles.
-- Student registration approval must be handled only by allowed roles.
+- Student registration must be validated against preloaded student master records using Student ID, full name, email, and school ID QR.
+- Student accounts may be auto-approved only when all required identity checks and face registration pass.
+- Failed student registration matching must be rejected immediately.
+- Duplicate account claims for the same student master record must be prevented.
 - Backend authorization must be enforced even if the UI hides restricted buttons.
 
 ### Deliverables
@@ -217,7 +224,7 @@ Pending → Approved → Rejected
 - Five technical roles defined.
 - Organization model created.
 - Shared officer account model prepared.
-- Student account model and status flow defined.
+- Student master record model and student account activation rules defined.
 - Initial backend authentication and authorization rules implemented.
 - API-first foundation ready for officer web, signatory web, and student mobile clients.
 
@@ -235,14 +242,14 @@ Pending → Approved → Rejected
 - [x] Five technical roles added: `SUPER_ADMIN`, `USG_OFFICER`, `ORG_OFFICER`, `STUDENT`, and `SIGNATORY`.
 - [x] Organization model added with initial support for `USG`, `SITE`, `PAFE`, and `AFPROTECH`.
 - [x] Shared officer account support added for `USG_OFFICER`, `SITE_OFFICER`, `PAFE_OFFICER`, and `AFPROTECH_OFFICER`.
-- [x] Student profile model added with student identity, course, section, school ID QR reference, and face embedding registration status fields.
-- [x] Student account status flow added with pending, approved, rejected, and deactivated states.
-- [x] Student rejection reason support added.
-- [x] Student course-to-organization visibility helper added for IT, BTLED, and BFPT mappings.
-- [x] Backend permission helpers added for approved access, student registration review, Super Admin access, and organization-owned record checks.
+- [x] Student master record and linked student account structure added with identity, course, section, school ID QR reference, and face embedding registration status fields.
+- [x] Student account activation flow prepared for auto-approval when preloaded student record matching, school ID QR matching, and face registration pass.
+- [x] Immediate rejection behavior prepared for failed student registration matching.
+- [x] Student course-to-organization visibility helper added for IT, BTLED, and BFPT mappings based on the linked student master record.
+- [x] Backend permission helpers added for approved access, student account activation validation, Super Admin access, and organization-owned record checks.
 - [x] JWT login and refresh endpoints added.
 - [x] Current authenticated user endpoint added.
-- [x] Backend-only student management API endpoints added for add, edit, approve, reject, and deactivate.
+- [x] Backend-only student master record and student account management API foundation added for add/import, edit, account activation support, and deactivate workflows.
 - [x] Rerunnable `seed_phase1` management command added for organizations and default accounts.
 - [x] Initial migrations added for accounts and organizations.
 - [x] Backend tests added for organization permissions, student API behavior, and seed command rerun safety.
@@ -537,6 +544,7 @@ This phase creates official violations, but payment obligations connected to vio
 - Facial recognition
 - Face registration support
 - Face embedding storage
+- Optional Cloudinary face reference image support only if formally approved
 - Sign-in and sign-out checkpoint records
 - Attendance status computation
 - Community service hour configuration
@@ -579,8 +587,10 @@ This phase creates official violations, but payment obligations connected to vio
 #### Facial Recognition
 
 - Implement face registration during student account registration.
-- Store face embeddings only.
-- Do not store raw face images as permanent records.
+- Store face embeddings as the primary long-term identity matching record.
+- Do not store raw face images permanently by default.
+- If permanent face image reference storage is formally approved by the school, adviser, or panel, store the image through Cloudinary with strict access control and store the official Cloudinary reference in PostgreSQL.
+- Do not use Firebase as the official face image database.
 - Require facial recognition during both sign-in and sign-out.
 - Reject attendance validation when face verification fails.
 
@@ -663,6 +673,7 @@ Build payment tracking, receipt verification, manual payment recording, violatio
 - Officer payment verification/rejection
 - Violation-generated payment obligations
 - USG Lost and Found
+- Cloudinary image storage for Lost and Found item photos
 
 ### Development Tasks
 
@@ -743,8 +754,12 @@ OTHER_EXTERNAL_PAYMENT
 - Allow only `USG_OFFICER` and `SUPER_ADMIN` to manage found item records.
 - Support actions:
   - post found item
+  - upload or update found item image
   - update found item details
   - mark found item as claimed
+- Store Lost and Found item images through Cloudinary.
+- Store the official Lost and Found record and Cloudinary image reference, such as the `public_id` and secure image URL, in PostgreSQL.
+- Ensure Cloudinary stores the image file only, while Django/PostgreSQL remains the source of truth for item status, visibility, ownership, and access control.
 - Apply status flow:
 
 ```text
@@ -776,7 +791,7 @@ Found → Claimed
 - Manual payment recording workflow.
 - Payment obligations generated from confirmed violations.
 - Student payment status visibility.
-- USG-only Lost and Found module.
+- USG-only Lost and Found module with Cloudinary-backed item image storage.
 
 ---
 
@@ -945,7 +960,7 @@ This phase builds simple near-real-time chat using polling or timed refresh. Ful
   - student mobile application
   - signatory web platform
 - Support notifications for:
-  - student account approval/rejection
+  - student account activation or rejected registration attempt
   - signatory account approval/rejection
   - new announcements
   - event or meeting updates
@@ -1002,7 +1017,7 @@ This phase focuses on student-facing usability, mobile attendance participation,
 ### Build Scope
 
 - Student mobile authentication
-- Student registration
+- Student account activation registration
 - Face registration
 - Student profile
 - Mobile calendar
@@ -1020,15 +1035,17 @@ This phase focuses on student-facing usability, mobile attendance participation,
 
 #### Mobile Authentication and Registration
 
-- Build student registration screens.
-- Capture required student identity and profile data.
-- Support school ID QR reference or extracted identity value.
+- Build student account activation registration screens.
+- Capture required matching details:
+  - Student ID
+  - full name
+  - email
+  - school ID QR scan or extracted school ID QR value
+- Submit the registration details to the backend for matching against preloaded student master records.
 - Support face registration for attendance verification.
-- Show account status:
-  - Pending
-  - Approved
-  - Rejected
-- Show rejection reason when applicable.
+- Show the result of registration matching:
+  - activated / approved when all checks pass
+  - rejected immediately when any required check fails
 - Build login, logout, token storage, and token refresh behavior.
 
 #### Mobile Calendar
@@ -1071,12 +1088,12 @@ This phase focuses on student-facing usability, mobile attendance participation,
 #### Lost and Found
 
 - Show USG-posted found item records.
-- Show found item details and claimed status.
+- Show found item details, Cloudinary-stored item images where available, and claimed status.
 - Do not allow students to submit lost-item reports or claim requests in the app.
 
 #### Notifications and Student Records
 
-- Show basic notifications.
+- Show notifications.
 - Show consolidated student records:
   - profile
   - attendance
@@ -1086,7 +1103,7 @@ This phase focuses on student-facing usability, mobile attendance participation,
 
 ### Access and Workflow Rules
 
-- Student mobile access must be limited to approved student accounts for protected features.
+- Student mobile access must be limited to activated/approved student accounts for protected features.
 - Student-visible records must include USG records plus records from the student’s assigned course/department organization.
 - Students must not manually switch organization context.
 - Students must not verify their own payments.
@@ -1096,7 +1113,7 @@ This phase focuses on student-facing usability, mobile attendance participation,
 ### Deliverables
 
 - Student Mobile Application connected to backend APIs.
-- Student registration and login flow.
+- Student account activation registration and login flow.
 - Mobile calendar, events, meetings, announcements, attendance, payments, Lost and Found, notifications, and student records.
 - Mobile attendance flow using school ID QR, geolocation, and facial recognition.
 - Student-facing visibility aligned with organization rules.
@@ -1251,7 +1268,7 @@ These items must not block the first complete system implementation unless forma
 - Detect possible spoofing attempts such as printed photos, screens, or static images.
 - Add challenge-based face verification if needed.
 - Keep face embedding privacy rules.
-- Avoid storing raw face images as permanent records unless formally approved.
+- Avoid storing raw face images as permanent records unless formally approved. If approved, Cloudinary may store the image file and PostgreSQL must store the official Cloudinary reference.
 
 #### Real-Time Chat Upgrade
 

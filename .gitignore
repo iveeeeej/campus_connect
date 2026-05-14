@@ -15,3 +15,7 @@ backend/media/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Agent framework
+.tmp/
+token.json

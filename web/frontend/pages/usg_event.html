@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements - USG</title>
+    <link rel="icon" href="../assets/logo/usg_logo_transparent.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="../pages/components/css/base.css">
+    <link rel="stylesheet" href="../pages/components/css/navbar.css">
+    <link rel="stylesheet" href="../pages/components/css/sidebar.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+        .content-area {
+            padding: 20px 30px 20px 30px;
+            flex: 1;
+        }
+
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 5px;
+            background: #1e174a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .add-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 5px;
+            background: #1e174a;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .add-btn:hover {
+            background: #2c2375;
+        }
+
+        /* Event layout */
+        .event-log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .empty-log {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6C757D;
+            background: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-log h5 {
+            color: #1e174a;
+            margin-bottom: 6px;
+        }
+
+        .empty-log p {
+            font-size: 0.88rem;
+            font-weight: 400;
+            margin-bottom: 0;
+        }
+
+        /* Sample-based announcement layout */
+        .page-header-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border-radius: 5px;
+            padding: 18px 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 24px;
+        }
+
+        .page-header-card h4 {
+            margin: 0;
+            color: #1e174a;
+            font-weight: 600;
+        }
+
+        .page-header-card .subtitle {
+            color: #6C757D;
+            font-size: 0.85rem;
+            font-weight: 400;
+            margin-top: 2px;
+            margin-bottom: 0;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #e5e5ee;
+            border-radius: 5px;
+            padding: 8px 14px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+            font-size: 0.9rem;
+            background: transparent;
+            color: #1e174a;
+        }
+
+        .search-box input::placeholder {
+            color: #6C757D;
+        }
+
+        .search-box svg {
+            color: #6C757D;
+            flex-shrink: 0;
+        }
+
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #e5e5ee;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            color: #1e174a;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn:focus {
+            border-color: #1e174a;
+            background: #fbfbfd;
+            color: #1e174a;
+        }
+
+        .filter-dropdown-menu {
+            border: 1px solid #ececf3;
+            border-radius: 5px;
+            box-shadow: 0 10px 24px rgba(30, 23, 74, 0.08);
+            padding: 8px;
+            min-width: 190px;
+        }
+
+        .filter-dropdown-menu .dropdown-item {
+            border-radius: 5px;
+            font-size: 0.88rem;
+            padding: 8px 12px;
+            color: #4f4f64;
+        }
+
+        .filter-dropdown-menu .dropdown-item.active,
+        .filter-dropdown-menu .dropdown-item:active {
+            background: #1e174a;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 16px;
+            }
+
+            .page-header-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: unset;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-header-content">
+                <div class="logo-container">
+                    <img src="../assets/logo/usg_logo.png" alt="USG Logo">
+                    <h4>University of Student Government</h4>
+                </div>
+                <button class="btn-close-sidebar" id="closeSidebar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-chevron-left-icon lucide-chevron-left">
+                        <path d="m15 18-6-6 6-6" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+
+            <div class="sidebar-section">
+                <p class="sidebar-section-title">Menu</p>
+                <ul>
+                    <li>
+                        <a href="usg_dashboard.html" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-layout-dashboard-icon lucide-layout-dashboard">
+                                    <rect width="7" height="9" x="3" y="3" rx="1" />
+                                    <rect width="7" height="5" x="14" y="3" rx="1" />
+                                    <rect width="7" height="9" x="14" y="12" rx="1" />
+                                    <rect width="7" height="5" x="3" y="16" rx="1" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Dashboard</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section" data-section="management">
+                <p class="sidebar-section-title collapsible">Management
+                    <svg class="section-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </p>
+                <ul>
+                    <li>
+                        <a href="usg_event.html" class="nav-link sidebar-link active">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-calendar-plus-icon lucide-calendar-plus">
+                                    <path d="M16 19h6" />
+                                    <path d="M16 2v4" />
+                                    <path d="M19 16v6" />
+                                    <path d="M21 12.598V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8.5" />
+                                    <path d="M3 10h18" />
+                                    <path d="M8 2v4" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Event</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="usg_meetings.html" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-users-icon lucide-users">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                    <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                    <circle cx="9" cy="7" r="4" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Meeting</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section" data-section="community">
+                <p class="sidebar-section-title collapsible">Community
+                    <svg class="section-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </p>
+                <ul>
+                    <li>
+                        <a href="usg_announcement.html" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-megaphone-icon lucide-megaphone">
+                                    <path
+                                        d="M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" />
+                                    <path d="M6 14a12 12 0 0 0 2.4 7.2 2 2 0 0 0 3.2-2.4A8 8 0 0 1 10 14" />
+                                    <path d="M8 6v8" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Announcement</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="usg_chat.html" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-message-circle-icon lucide-message-circle">
+                                    <path
+                                        d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Chat</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section" data-section="services">
+                <p class="sidebar-section-title collapsible">Services
+                    <svg class="section-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </p>
+                <ul>
+                    <li>
+                        <a href="#" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-user-plus-icon lucide-user-plus">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <line x1="19" x2="19" y1="8" y2="14" />
+                                    <line x1="22" x2="16" y1="11" y2="11" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Attendance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-triangle-alert-icon lucide-triangle-alert">
+                                    <path
+                                        d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+                                    <path d="M12 9v4" />
+                                    <path d="M12 17h.01" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Violations</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-circle-question-mark-icon lucide-circle-question-mark">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                    <path d="M12 17h.01" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Lost and Found</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-banknote-icon lucide-banknote">
+                                    <rect width="20" height="12" x="2" y="6" rx="2" />
+                                    <circle cx="12" cy="12" r="2" />
+                                    <path d="M6 12h.01M18 12h.01" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Payment</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section" data-section="reports">
+                <p class="sidebar-section-title collapsible">Reports
+                    <svg class="section-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </p>
+                <ul>
+                    <li>
+                        <a href="#" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-file-pen-icon lucide-file-pen">
+                                    <path
+                                        d="M12.659 22H18a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v9.34" />
+                                    <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                                    <path
+                                        d="M10.378 12.622a1 1 0 0 1 3 3.003L8.36 20.637a2 2 0 0 1-.854.506l-2.867.837a.5.5 0 0 1-.62-.62l.836-2.869a2 2 0 0 1 .506-.853z" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">AWFP</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-file-user-icon lucide-file-user">
+                                    <path
+                                        d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                                    <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                                    <path d="M16 22a4 4 0 0 0-8 0" />
+                                    <circle cx="12" cy="15" r="3" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">President's Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-file-chart-column-increasing-icon lucide-file-chart-column-increasing">
+                                    <path
+                                        d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                                    <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                                    <path d="M8 18v-2" />
+                                    <path d="M12 18v-4" />
+                                    <path d="M16 18v-6" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Financial Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-file-spreadsheet-icon lucide-file-spreadsheet">
+                                    <path
+                                        d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                                    <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                                    <path d="M8 13h2" />
+                                    <path d="M14 13h2" />
+                                    <path d="M8 17h2" />
+                                    <path d="M14 17h2" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Auditor's Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link sidebar-link">
+                            <span class="sidebar-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-file-check-icon lucide-file-check">
+                                    <path
+                                        d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                                    <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                                    <path d="m9 15 2 2 4-4" />
+                                </svg>
+                            </span>
+                            <span class="sidebar-text">Accomplishment Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="main-content">
+        <nav class="top-navbar">
+            <button class="menu-toggle" id="menuToggle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-menu-icon lucide-menu">
+                    <path d="M4 5h16" />
+                    <path d="M4 12h16" />
+                    <path d="M4 19h16" />
+                </svg>
+            </button>
+
+            <div class="user-info">
+                <div class="notifications">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-bell-icon lucide-bell">
+                        <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+                        <path
+                            d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+                    </svg>
+                </div>
+                <div class="user-avatar-wrapper" id="userAvatarWrapper">
+                    <div class="user-avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-circle-user-icon lucide-circle-user">
+                            <circle cx="12" cy="12" r="10" />
+                            <circle cx="12" cy="10" r="3" />
+                            <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+                        </svg>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#">
+                            <i class="bi bi-person"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="#">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="content-area">
+            <div class="page-header-card">
+                <div>
+                    <h4>Events</h4>
+                </div>
+                <button class="add-btn" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-plus-icon lucide-plus">
+                        <path d="M5 12h14" />
+                        <path d="M12 5v14" />
+                    </svg>
+                    Add
+                </button>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                    <input type="text" placeholder="Search events...">
+                </div>
+                <div class="dropdown">
+                    <button class="filter-btn" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Filter: All
+                    </button>
+                </div>
+            </div>
+
+            <div class="event-log-list" id="eventLogList">
+                <div class="empty-log">
+                    <h5 class="mb-2">Loading Events...</h5>
+                    <p class="mb-0">The page is pulling event records from the backend.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
+        <script src="../assets/js/app-config.js"></script>
+        <script src="../assets/js/api-client.js"></script>
+        <script src="../org_usg/components/js/sidebar.js"></script>
+
+</body>
+
+</html>
