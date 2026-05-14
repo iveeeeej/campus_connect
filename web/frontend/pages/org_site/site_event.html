@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Announcements - USG</title>
+    <title>Events - SITE</title>
     <link rel="icon" href="../../assets/logo/usg_logo_transparent.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -49,193 +49,11 @@
             background: #2c2375;
         }
 
-        /* Announcement layout */
-        .announcement-log-list {
+        /* Event layout */
+        .event-log-list {
             display: flex;
             flex-direction: column;
             gap: 14px;
-        }
-
-        .announcement-status {
-            display: inline-flex;
-            align-items: center;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            flex-shrink: 0;
-        }
-
-        .type-general {
-            background: #1e174a1a;
-            color: #1e174a;
-        }
-
-        .type-event {
-            background: #fff1e6;
-            color: #ff4d00;
-        }
-
-        .type-academic {
-            background: #28a7881f;
-            color: #2e6f40;
-        }
-
-        .type-cleaning {
-            background: #f3e8df;
-            color: #6f4e37;
-        }
-
-        .type-seminar {
-            background: #d9f2f7;
-            color: #4e9fe5;
-        }
-
-        .type-maintenance {
-            background: #ececec;
-            color: #495057;
-        }
-
-        .type-urgent {
-            background: #f8d7da;
-            color: #fa003f;
-        }
-
-        .type-important {
-            background: #fff3cd;
-            color: #7c5c00;
-        }
-
-        .announcement-feedback {
-            border-radius: 5px;
-            padding: 12px 14px;
-            margin-bottom: 16px;
-        }
-
-        .announcement-feedback.hidden {
-            display: none;
-        }
-
-        .announcement-feedback.info {
-            background: #e7f1ff;
-            color: #0a58ca;
-            border: 1px solid #b6d4fe;
-        }
-
-        .announcement-feedback.error {
-            background: #f8d7da;
-            color: #842029;
-            border: 1px solid #f1aeb5;
-        }
-
-        .announcement-feedback.success {
-            background: #d1e7dd;
-            color: #0f5132;
-            border: 1px solid #a3cfbb;
-        }
-
-        .announcement-log-item {
-            background: white;
-            border: none;
-            border-radius: 5px;
-            padding: 22px 25px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: box-shadow 0.2s ease;
-        }
-
-        .announcement-log-item:hover {
-            transform: none;
-            box-shadow: 0 4px 16px rgba(30, 23, 74, 0.1);
-        }
-
-        .announcement-log-header {
-            border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 8px;
-        }
-
-        .announcement-log-title {
-            margin: 0;
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #1e174a;
-        }
-
-        .announcement-log-content {
-            color: #9e9eb5;
-            font-size: 0.88rem;
-            line-height: 1.55;
-            font-weight: 400;
-            margin-bottom: 12px;
-            white-space: pre-wrap;
-        }
-
-        .announcement-log-meta {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            color: #6C757D;
-            font-size: 0.78rem;
-            font-weight: 400;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        .announcement-log-meta span {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .announcement-log-meta svg {
-            width: 14px;
-            height: 14px;
-            flex-shrink: 0;
-        }
-
-        .announcement-log-footer {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 16px;
-            padding-top: 12px;
-            border-top: 1px solid #f1f2f7;
-        }
-
-        .announcement-log-actions {
-            display: inline-flex;
-            gap: 10px;
-        }
-
-        .announcement-action-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border: none;
-            border-radius: 5px;
-            background: #eff6ff;
-            color: #3b82f6;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .announcement-action-btn:hover {
-            background: #2563eb;
-            color: #ffffff;
-        }
-
-        .announcement-action-btn.delete {
-            color: #dc3545;
-            background: #fff5f5;
-        }
-
-        .announcement-action-btn.delete:hover {
-            background: #dc3545;
-            color: #ffffff;
         }
 
         .empty-log {
@@ -257,39 +75,6 @@
             font-size: 0.88rem;
             font-weight: 400;
             margin-bottom: 0;
-        }
-
-        /* Modernized Modal & Inputs */
-        .modal-content {
-            border: none;
-            border-radius: 5px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #eef0f2;
-            border-radius: 16px 16px 0 0;
-            padding: 20px 24px;
-        }
-
-        .form-control,
-        .form-select {
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 12px 16px;
-            font-size: 0.95rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #1e174a;
-            box-shadow: 0 0 0 0.25rem rgba(30, 23, 74, 0.15);
-        }
-
-        .form-floating>label {
-            padding: 12px 16px;
         }
 
         /* Sample-based announcement layout */
@@ -450,7 +235,7 @@
                 <p class="sidebar-section-title">Menu</p>
                 <ul>
                     <li>
-                        <a href="usg_dashboard.html" class="nav-link sidebar-link">
+                        <a href="site_dashboard.html" class="nav-link sidebar-link">
                             <span class="sidebar-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -477,7 +262,7 @@
                 </p>
                 <ul>
                     <li>
-                        <a href="usg_event.html" class="nav-link sidebar-link">
+                        <a href="site_event.html" class="nav-link sidebar-link active">
                             <span class="sidebar-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -495,9 +280,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="usg_meetings.html" class="nav-link sidebar-link">
-
-
+                        <a href="site_meetings.html" class="nav-link sidebar-link">
                             <span class="sidebar-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -523,7 +306,7 @@
                 </p>
                 <ul>
                     <li>
-                        <a href="usg_announcement.html" class="nav-link sidebar-link active">
+                        <a href="site_announcement.html" class="nav-link sidebar-link">
                             <span class="sidebar-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -538,7 +321,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="usg_chat.html" class="nav-link sidebar-link">
+                        <a href="site_chat.html" class="nav-link sidebar-link">
                             <span class="sidebar-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -772,10 +555,9 @@
         <div class="content-area">
             <div class="page-header-card">
                 <div>
-                    <h4>Announcements</h4>
+                    <h4>Events</h4>
                 </div>
-                <button class="add-btn" id="openAnnouncementModalButton" type="button" data-bs-toggle="modal"
-                    data-bs-target="#announcementModal">
+                <button class="add-btn" type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="lucide lucide-plus-icon lucide-plus">
@@ -794,41 +576,20 @@
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="text" id="announcementSearchInput" placeholder="Search announcements...">
+                    <input type="text" placeholder="Search events...">
                 </div>
                 <div class="dropdown">
-                    <button class="filter-btn" id="announcementFilterButton" type="button" data-bs-toggle="dropdown"
+                    <button class="filter-btn" type="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         Filter: All
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end filter-dropdown-menu" id="announcementFilterMenu">
-                        <li><button class="dropdown-item active" type="button"
-                                data-announcement-filter="all">All</button></li>
-                        <li><button class="dropdown-item" type="button"
-                                data-announcement-filter="general">General</button></li>
-                        <li><button class="dropdown-item" type="button" data-announcement-filter="event">Event</button>
-                        </li>
-                        <li><button class="dropdown-item" type="button"
-                                data-announcement-filter="academic">Academic</button></li>
-                        <li><button class="dropdown-item" type="button"
-                                data-announcement-filter="cleaning">Cleaning</button></li>
-                        <li><button class="dropdown-item" type="button"
-                                data-announcement-filter="seminar">Seminar</button></li>
-                        <li><button class="dropdown-item" type="button"
-                                data-announcement-filter="maintenance">Maintenance</button></li>
-                        <li><button class="dropdown-item" type="button"
-                                data-announcement-filter="urgent">Urgent</button></li>
-                        <li><button class="dropdown-item" type="button"
-                                data-announcement-filter="important">Important</button></li>
-                    </ul>
                 </div>
             </div>
 
-            <div class="announcement-feedback hidden" id="announcementFeedback"></div>
-            <div class="announcement-log-list" id="announcementLogList">
+            <div class="event-log-list" id="eventLogList">
                 <div class="empty-log">
-                    <h5 class="mb-2">Loading Announcements...</h5>
-                    <p class="mb-0">The page is pulling announcement records from the backend.</p>
+                    <h5 class="mb-2">Loading Events...</h5>
+                    <p class="mb-0">The page is pulling event records from the backend.</p>
                 </div>
             </div>
 
