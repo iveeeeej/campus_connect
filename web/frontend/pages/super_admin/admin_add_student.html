@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chats - ADMIN</title>
+    <title>Add Student - ADMIN</title>
     <link rel="icon" href="../../assets/logo/usg_logo_transparent.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -18,101 +18,6 @@
             padding: 20px 30px 20px 30px;
             flex: 1;
             position: relative;
-        }
-
-        /* Chat composer docked inside .content-area */
-        .chat-composer-dock {
-            z-index: 20;
-            pointer-events: none;
-        }
-
-        .floating-composer {
-            max-width: 56rem;
-            pointer-events: auto;
-            background: white;
-            border: 1px solid #e5e5ee;
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgb(0 0 0 / 8%);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            transition: box-shadow 0.2s ease;
-        }
-
-        .floating-composer:hover {
-            box-shadow: 0 8px 30px rgb(0 0 0 / 12%);
-        }
-
-        .chat-composer-input {
-            min-width: 0;
-            font-size: 15px;
-            line-height: 1.45;
-            min-height: 2.5rem;
-            max-height: 10rem;
-            resize: none;
-            overflow-y: auto;
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
-
-        .chat-composer-input:focus {
-            box-shadow: none;
-            outline: none;
-        }
-
-        /* Composer toolbar icon buttons (replaces Bootstrap btn-light + rounded-circle) */
-        .chat-composer-attach-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            width: 2.5rem;
-            height: 2.5rem;
-            padding: 0;
-            margin: 0;
-            border: none;
-            border-radius: 10px;
-            background-color: #f8f9fa;
-            color: #6c757d;
-            cursor: pointer;
-            line-height: 0;
-            transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
-        }
-
-        .chat-composer-attach-btn:hover {
-            background-color: #f1f5f9;
-            color: #1e174a;
-        }
-
-        .chat-composer-attach-btn:active {
-            transform: scale(0.95);
-        }
-
-        .chat-composer-attach-btn:focus-visible {
-            outline: 2px solid rgba(30, 23, 74, 0.35);
-            outline-offset: 2px;
-        }
-
-        /* Send: icon only (no chip background / border) */
-        .chat-composer-send-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            width: 2.5rem;
-            height: 2.5rem;
-            padding: 0;
-            margin: 0;
-            border: none;
-            border-radius: 0;
-            background: none;
-            background-color: transparent;
-            box-shadow: none;
-            color: #1e174a;
-            cursor: pointer;
-            line-height: 0;
-            -webkit-appearance: none;
-            appearance: none;
-            transition: color 0.15s ease, transform 0.1s ease;
         }
     </style>
 </head>
@@ -202,9 +107,15 @@
                         </a>
                     </li>
                     <li>
-                        <a href="admin_add_student.html" class="nav-link sidebar-link">
+                        <a href="admin_add_student.html" class="nav-link sidebar-link active">
                             <span class="sidebar-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-plus-icon lucide-circle-plus"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-circle-plus-icon lucide-circle-plus">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M8 12h8" />
+                                    <path d="M12 8v8" />
+                                </svg>
                             </span>
                             <span class="sidebar-text">Add Student</span>
                         </a>
@@ -236,7 +147,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="admin_chat.html" class="nav-link sidebar-link active">
+                        <a href="admin_chat.html" class="nav-link sidebar-link">
                             <span class="sidebar-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -452,26 +363,7 @@
         </nav>
 
         <div class="content-area">
-            <div
-                class="chat-composer-dock position-absolute bottom-0 start-0 end-0 px-4 pb-4 d-flex justify-content-center">
-                <div class="floating-composer w-100 p-2 d-flex align-items-end gap-2">
-                    <button type="button" class="chat-composer-attach-btn" aria-label="Attach file">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343a40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-paperclip-icon lucide-paperclip"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"/></svg>
-                    </button>
-                    <textarea rows="1"
-                        class="form-control border-0 bg-transparent shadow-none flex-fill chat-composer-input text-secondary px-2"
-                        placeholder="Type a message..." autocomplete="off"></textarea>
-                    <button type="button" class="chat-composer-send-btn" aria-label="Send message">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-send-horizontal-icon lucide-send-horizontal">
-                            <path
-                                d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z" />
-                            <path d="M6 12h16" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
+            <!-- content goes here -->
         </div>
 
     </div>
