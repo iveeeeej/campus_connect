@@ -276,6 +276,27 @@
             border-radius: 50%;
         }
 
+        .filter-dropdown-menu {
+            border: 1px solid #ececf3;
+            border-radius: 5px;
+            box-shadow: 0 10px 24px rgba(30, 23, 74, 0.08);
+            padding: 8px;
+            min-width: 190px;
+        }
+
+        .filter-dropdown-menu .dropdown-item {
+            border-radius: 5px;
+            font-size: 0.88rem;
+            padding: 8px 12px;
+            color: #4f4f64;
+        }
+
+        .filter-dropdown-menu .dropdown-item.active,
+        .filter-dropdown-menu .dropdown-item:active {
+            background: #1e174a;
+            color: white;
+        }
+
         /* Pulse animation for real-time icon */
         .dashboard-pulse-icon {
             animation: dashPulse 2s ease-in-out infinite;
@@ -904,7 +925,7 @@
                     <section class="bg-white rounded-3 p-4 shadow-sm">
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <h6 class="fw-bold mb-0" style="color: #1e174a;">April 2026</h6>
-                            <div class="d-flex gap-1">
+                            <div class="d-flex align-items-center gap-1">
                                 <button class="btn btn-sm btn-light p-1 rounded">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                         fill="none" stroke="#6c757d" stroke-width="2" stroke-linecap="round"
@@ -919,6 +940,25 @@
                                         <path d="m9 18 6-6-6-6" />
                                     </svg>
                                 </button>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm dropdown-toggle text-white rounded px-2" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                        style="background-color: #1e174a; border-color: #1e174a; font-size: 13px;">
+                                        All
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end filter-dropdown-menu">
+                                        <li><button class="dropdown-item active" type="button"
+                                                data-calendar-org-filter="all">All Organizations</button></li>
+                                        <li><button class="dropdown-item" type="button"
+                                                data-calendar-org-filter="USG">USG</button></li>
+                                        <li><button class="dropdown-item" type="button"
+                                                data-calendar-org-filter="SITE">SITE</button></li>
+                                        <li><button class="dropdown-item" type="button"
+                                                data-calendar-org-filter="PAFE">PAFE</button></li>
+                                        <li><button class="dropdown-item" type="button"
+                                                data-calendar-org-filter="AFPROTECH">AFPROTECH</button></li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                         <!-- Day Headers -->
