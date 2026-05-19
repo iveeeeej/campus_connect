@@ -103,7 +103,7 @@
         }
 
         .form-check-label {
-            font-size: 10px;
+            font-size: 15px;
             font-weight: 380;
             color: #343a40;
             margin-left: 0.5rem;
@@ -111,7 +111,7 @@
 
         .forgot-password {
             margin-top: 0.5rem;
-            font-size: 10px;
+            font-size: 15px;
             font-weight: 500;
             color: #343a40;
             text-decoration: none;
@@ -148,13 +148,13 @@
         }
 
         .sign-in-label {
-            font-size: 10px;
+            font-size: 15px;
             font-weight: 380;
             color: #343a40;
         }
 
         .sign-in {
-            font-size: 10;
+            font-size: 15px;
             font-weight: 500;
             color: #343a40;
             text-decoration: none;
@@ -172,6 +172,29 @@
             margin-top: 2rem;
         }
 
+
+        .login-feedback {
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .login-feedback.hidden {
+            display: none;
+        }
+
+        .login-feedback.error {
+            background: #f8d7da;
+            color: #842029;
+            border: 1px solid #f1aeb5;
+        }
+
+        .login-feedback.success {
+            background: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #a3cfbb;
+        }
         /* Mobile Responsive Styles */
         @media (max-width: 991.98px) {
 
@@ -233,6 +256,7 @@
                         <div class="mb-3">
                             <h1 class="welcome-text">WELCOME</h1>
                         </div>
+                        <div class="login-feedback hidden" id="loginFeedback"></div>
                         <div class="mb-3">
                             <input type="text" class="form-control" id="userName" name="username"
                                 placeholder="Username">
@@ -255,7 +279,7 @@
                                 <a href="#" class="terms-conditions" id="openTerm">Terms &amp; Conditions</a>
                             </div>
                         </div>
-                        <button type="submit" class="btn-login">LOGIN</button>
+                        <button type="submit" class="btn-login" id="loginButton">LOGIN</button>
                         <div class="text-center">
                             <label class="sign-in-label" for="signIN">Don't have an Account?</label>
                             <a href="#" class="sign-in" id="openSign">SIGN IN</a>
@@ -270,6 +294,129 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
         </script>
+    <script>
+        (() => {
+            const loginForm = document.getElementById("loginForm");
+            const usernameInput = document.getElementById("userName");
+            const passwordInput = document.getElementById("password");
+            const rememberMeInput = document.getElementById("rememberMe");
+            const acceptTermsInput = document.getElementById("acceptTerms");
+            const loginButton = document.getElementById("loginButton");
+            const loginFeedback = document.getElementById("loginFeedback");
+
+            const storageKeys = [
+                "campusConnectAccessToken",
+                "campusConnectRefreshToken",
+                "campusConnectUser",
+                "accessToken",
+                "access_token",
+                "access"
+            ];
+
+            const getApiBaseUrl = () => {
+                const configuredUrl = window.CAMPUS_CONNECT_API_BASE_URL || localStorage.getItem("campusConnectApiBaseUrl");
+                if (configuredUrl) {
+                    return configuredUrl.replace(/\/$/, "");
+                }
+
+                const isDjangoOrigin = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+                    && window.location.port === "8000";
+                if (isDjangoOrigin) {
+                    return window.location.origin;
+                }
+
+                return "http://127.0.0.1:8000";
+            };
+
+            const showFeedback = (message, type = "error") => {
+                loginFeedback.textContent = message;
+                loginFeedback.className = `login-feedback ${type}`;
+            };
+
+            const clearStoredLogin = () => {
+                storageKeys.forEach((key) => {
+                    localStorage.removeItem(key);
+                    sessionStorage.removeItem(key);
+                });
+            };
+
+            const saveLogin = (payload) => {
+                clearStoredLogin();
+                const storage = rememberMeInput.checked ? localStorage : sessionStorage;
+                storage.setItem("campusConnectAccessToken", payload.access);
+                storage.setItem("campusConnectRefreshToken", payload.refresh);
+                storage.setItem("campusConnectUser", JSON.stringify(payload.user));
+            };
+
+            const getErrorMessage = async (response) => {
+                try {
+                    const payload = await response.json();
+                    if (typeof payload?.detail === "string") {
+                        return payload.detail;
+                    }
+                    if (typeof payload?.error === "string") {
+                        return payload.error;
+                    }
+                    if (payload?.error?.detail) {
+                        return payload.error.detail;
+                    }
+                } catch (error) {
+                    return "Login failed. Please check the backend server and try again.";
+                }
+
+                return "Login failed. Please check your username and password.";
+            };
+
+            loginForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value;
+
+                if (!username || !password) {
+                    showFeedback("Please enter your username and password.");
+                    return;
+                }
+
+                if (!acceptTermsInput.checked) {
+                    showFeedback("Please accept the Terms & Conditions before logging in.");
+                    return;
+                }
+
+                loginButton.disabled = true;
+                loginButton.textContent = "LOGGING IN...";
+                showFeedback("Checking your account...", "success");
+
+                try {
+                    const response = await fetch(`${getApiBaseUrl()}/api/auth/token/`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(await getErrorMessage(response));
+                    }
+
+                    const payload = await response.json();
+                    if (payload.user?.role !== "SUPER_ADMIN") {
+                        throw new Error("Only the Super Admin dashboard is wired in this step.");
+                    }
+
+                    saveLogin(payload);
+                    showFeedback("Login successful. Opening Super Admin dashboard...", "success");
+                    window.location.href = "pages/super_admin/admin_dashboard.html";
+                } catch (error) {
+                    clearStoredLogin();
+                    showFeedback(error.message || "Login failed. Please try again.");
+                    loginButton.disabled = false;
+                    loginButton.textContent = "LOGIN";
+                }
+            });
+        })();
+    </script>
 
 </body>
 

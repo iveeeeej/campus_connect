@@ -50,6 +50,7 @@ GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH") or None
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "apps.core.middleware.LocalDevelopmentCorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -155,6 +156,4 @@ LOGGING = {
         "level": LOG_LEVEL,
     },
 }
-
-
 
