@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.organizations",
     "apps.accounts",
+    "apps.scheduling",
 ]
 
 USE_POSTGIS = env_bool("USE_POSTGIS", False)
@@ -154,3 +155,6 @@ LOGGING = {
         "level": LOG_LEVEL,
     },
 }
+
+
+

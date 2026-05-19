@@ -10,5 +10,9 @@ urlpatterns = [
     path("api/auth/token/", CampusConnectTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/accounts/", include("apps.accounts.urls")),
+    path("api/calendar/", include("apps.scheduling.urls")),
     path("api/organizations/", include("apps.organizations.urls")),
 ]
+
+
+
