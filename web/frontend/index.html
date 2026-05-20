@@ -54,10 +54,12 @@
 
         .image-caption-1 {
             color: #343a40;
+            font-weight: 600;
         }
 
         .image-caption-2 {
             color: #1E174A;
+            font-weight: 600;
         }
 
         .highlight-text {
@@ -79,7 +81,7 @@
         .logo-brand {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            justify-content: center;
             margin-bottom: 0.5rem;
         }
 
@@ -99,10 +101,12 @@
 
         .brand-campus {
             color: #1E174A;
+            font-weight: 600;
         }
 
         .brand-connect {
             color: #f9a702;
+            font-weight: 600;
         }
 
         .form-control {
@@ -121,8 +125,9 @@
             box-shadow: none;
         }
 
-        .form-check-1 {
+        .form-check {
             margin-top: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         .form-check-label {
@@ -179,8 +184,8 @@
         }
 
         .welcome-text {
-            font-size: 2.2rem;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 600;
             color: #343a40;
             margin-top: 2rem;
         }
@@ -261,15 +266,15 @@
                     <!-- Logo & Title -->
                     <div class="logo-brand">
                         <img src="../frontend/assets/logo/campusconnect_logo.png" alt="Logo" class="logo">
-                        <p class="brand-title">
+                        <h1 class="brand-title">
                             <span class="brand-campus">Campus</span><span class="brand-connect"> Connect</span>
-                        </p>
+                        </h1>
                     </div>
 
                     <!-- Login Form -->
                     <form id="loginForm">
                         <div class="mb-3">
-                            <h1 class="welcome-text">WELCOME</h1>
+                            <h2 class="welcome-text">WELCOME</h2>
                         </div>
                         <div class="login-feedback hidden" id="loginFeedback"></div>
                         <div class="mb-3">
@@ -282,7 +287,7 @@
                         </div>
                         <div class="mb-3 d-flex flex-column gap-2">
                             <div class="d-flex justify-content-between align-items-center">
-                                <div class="form-check-1">
+                                <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="rememberMe" name="remember_me">
                                     <label class="form-check-label" for="rememberMe">Remember Me</label>
                                 </div>
