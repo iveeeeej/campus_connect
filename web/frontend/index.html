@@ -47,10 +47,17 @@
 
         .image-caption {
             font-size: 3rem;
-            font-weight: bold;
-            text-align: center;
+            text-align: left;
             margin-top: 2rem;
             color: #343a40;
+        }
+
+        .image-caption-1 {
+            color: #343a40;
+        }
+
+        .image-caption-2 {
+            color: #1E174A;
         }
 
         .highlight-text {
@@ -69,13 +76,33 @@
             min-height: 650px;
         }
 
+        .logo-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
         .logo {
             width: 150px;
             height: auto;
             border-radius: 50%;
             object-fit: cover;
-            margin: 0 auto;
-            display: block;
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .brand-campus {
+            color: #1E174A;
+        }
+
+        .brand-connect {
+            color: #f9a702;
         }
 
         .form-control {
@@ -98,10 +125,6 @@
             margin-top: 0.5rem;
         }
 
-        .form-check-2 {
-            margin-bottom: 0.5rem;
-        }
-
         .form-check-label {
             font-size: 15px;
             font-weight: 380;
@@ -118,16 +141,6 @@
         }
 
         .forgot-password:hover {
-            color: #007bff;
-            text-decoration: underline;
-        }
-
-        .terms-conditions {
-            color: #343a40;
-            text-decoration: none;
-        }
-
-        .terms-conditions:hover {
             color: #007bff;
             text-decoration: underline;
         }
@@ -236,20 +249,22 @@
             <div class="col-md-6 d-flex justify-content-center align-items-center">
                 <div class="image-caption-card">
                     <img src="../frontend/assets/images/login_img_2.gif" alt="img">
-                    <div class="image-caption">
-                        <text>THE INNOVATORS OF TOMORROW,</text>
-                    </div>
-                    <div class="highlight-text">
-                        <text>TRAILBLAZERS</text>
-                    </div>
+                    <p class="image-caption">
+                        <span class="image-caption-1">THE INNOVATORS OF TOMORROW,</span><span class="image-caption-2"> TRAILBLAZERS</span>
+                    </p>
                 </div>
             </div>
 
 
             <div class="col-md-6 d-flex justify-content-end align-items-center">
                 <div class="login-card">
-                    <!-- Logo -->
-                    <img src="../frontend/assets/logo/usg_logo.png" alt="Logo" class="logo">
+                    <!-- Logo & Title -->
+                    <div class="logo-brand">
+                        <img src="../frontend/assets/logo/campusconnect_logo.png" alt="Logo" class="logo">
+                        <p class="brand-title">
+                            <span class="brand-campus">Campus</span><span class="brand-connect"> Connect</span>
+                        </p>
+                    </div>
 
                     <!-- Login Form -->
                     <form id="loginForm">
@@ -273,11 +288,6 @@
                                 </div>
                                 <a href="#" class="forgot-password" id="openForgot">Forgot Password?</a>
                             </div>
-                            <div class="form-check-2">
-                                <input class="form-check-input" type="checkbox" id="acceptTerms" name="accept_terms">
-                                <label class="form-check-label" for="acceptTerms">Accept</label>
-                                <a href="#" class="terms-conditions" id="openTerm">Terms &amp; Conditions</a>
-                            </div>
                         </div>
                         <button type="submit" class="btn-login" id="loginButton">LOGIN</button>
                         <div class="text-center">
@@ -300,7 +310,6 @@
             const usernameInput = document.getElementById("userName");
             const passwordInput = document.getElementById("password");
             const rememberMeInput = document.getElementById("rememberMe");
-            const acceptTermsInput = document.getElementById("acceptTerms");
             const loginButton = document.getElementById("loginButton");
             const loginFeedback = document.getElementById("loginFeedback");
 
@@ -375,11 +384,6 @@
 
                 if (!username || !password) {
                     showFeedback("Please enter your username and password.");
-                    return;
-                }
-
-                if (!acceptTermsInput.checked) {
-                    showFeedback("Please accept the Terms & Conditions before logging in.");
                     return;
                 }
 

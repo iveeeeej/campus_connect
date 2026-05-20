@@ -34,6 +34,18 @@ The development roadmap follows these principles:
 - Keep external payment processing separate from system payment tracking.
 - Keep advanced enhancements separate from the first complete system build.
 
+### Strict Workflow Guide
+
+To avoid implementation confusion, the current build must follow this strict work sequence:
+
+1. Build and complete the `SUPER_ADMIN` workflow first.
+2. Build the Student Mobile Application workflow after the `SUPER_ADMIN` workflow is ready enough to support mobile-facing records and controls.
+3. After `SUPER_ADMIN` and mobile workflows are working, build the organization officer workflows for `USG`, `SITE`, `PAFE`, and `AFPROTECH`.
+4. Proceed to Phase 9 testing and hardening only after the `SUPER_ADMIN`, mobile, and organization officer workflows are complete enough for end-to-end validation.
+5. Proceed to Phase 10 enhancements only after Phase 9 confirms the main system is stable.
+
+The `USG`, `SITE`, `PAFE`, and `AFPROTECH` organizations must remain in the data model, seed data, ownership rules, permissions, and filters from the beginning. However, dedicated organization officer workflows and organization-specific UI work must be deferred until after the `SUPER_ADMIN` and Student Mobile Application workflows. While working on earlier phases, only build organization-related behavior when it is required for backend ownership, `SUPER_ADMIN` filtering, access enforcement, or mobile visibility.
+
 Each phase uses the following structure:
 
 ### Purpose
@@ -1326,3 +1338,5 @@ The revised Campus Connect development order is:
 10. **Future Enhancements**
 
 This roadmap builds the system from the backend and access-control foundation first, then proceeds through officer workflows, event documents, attendance, services, reports, communication, student mobile integration, testing, and controlled enhancements.
+
+Implementation must follow the strict workflow guide above: complete the `SUPER_ADMIN` path first, then the Student Mobile Application path, then the dedicated `USG`, `SITE`, `PAFE`, and `AFPROTECH` organization officer paths, then Phase 9 and Phase 10. Organization records and ownership rules stay in place throughout, but organization-specific officer work is deferred until its turn.
